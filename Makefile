@@ -16,7 +16,7 @@ CC=gcc
 CXX=clang++
 COMPILER=$(CC)
 CFLAGS=-Wall -Wextra -Werror -std=c11 -pedantic -g
-LFLAGS=-lX11 -lm
+LFLAGS=-lSDL2 -lm
 FLAGS=
 
 ERASE=rm
@@ -32,7 +32,7 @@ ZIPPABLES=$(SRC) ./typescript ./latex/refman.pdf
 
 # TARGETS ========================================
 
-all : $(EXE)
+build : $(EXE)
 	
 $(EXE) : $(OBJ)
 >$(COMPILER) $(CFLAGS) -I$(INCLUDE) $^ -o $@ $(LFLAGS) 
@@ -52,6 +52,10 @@ run :
 
 clean :
 >$(ERASE) $(OBJ) $(EXE)
+
+rebuild: clean build
+
+try : build run
 
 script :
 >script -c "bash -x ./$(ASSIGNMENTNAME)script.sh"
