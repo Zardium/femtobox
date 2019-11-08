@@ -37,8 +37,11 @@ all : $(EXE)
 $(EXE) : $(OBJ)
 >$(COMPILER) $(CFLAGS) -I$(INCLUDE) $^ -o $@ $(LFLAGS) 
 
-$(OBJECT_DIR)%.o : $(SOURCE_DIR)%$(SRC_EXT)
+$(OBJECT_DIR)%.o : $(SOURCE_DIR)%$(SRC_EXT) | $(OBJECT_DIR)
 >$(COMPILER) $(CFLAGS) -I$(INCLUDE) -c $^ -o $@
+
+$(OBJECT_DIR) :
+>mkdir -p $(OBJECT_DIR)
 
 $(NUMBERS) :
 >./$(EXE) $@ > student-output-$(word $(shell expr $@ + 1), $(NAMES))
