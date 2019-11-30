@@ -13,13 +13,13 @@ INCLUDE=./include/
 EXE=$(OUTPUT_DIR)$(ASSIGNMENTNAME)
 
 CC=gcc
-CXX=clang++
+CXX=g++
 COMPILER=$(CC)
-CFLAGS=-Wall -Wextra -Werror -std=c11 -pedantic -g
+CFLAGS=-Wall -Wextra -Werror -std=c11 -pedantic -g -O0
 LFLAGS=-lSDL2 -lm
 FLAGS=
 
-ERASE=rm
+ERASE=rm -f
 
 NUMBERS=0 1 2 3 4 5 6 7 8 9 10 11
 NAMES=all add_front add_end remove1 remove2 insert_before1 insert_after1 find1 \
