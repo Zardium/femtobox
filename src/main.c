@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
   UNUSED_PARAMETER(argv);
 
   SDL_Event event;
-  window_t* win = window_alloc(INTERNAL_WIDTH, INTERNAL_HEIGHT);
+  window_t* win = window_alloc(512, 512);
 
   pixelbuffer_t* pix_buf = pixelbuffer_alloc(INTERNAL_WIDTH, INTERNAL_HEIGHT);
 
