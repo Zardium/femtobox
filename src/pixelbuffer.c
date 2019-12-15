@@ -1,5 +1,6 @@
 #include "pixelbuffer.h" /* Declarations. */
 
+/* STANDARD LIBRARY */
 #include <stdlib.h> /* malloc, calloc */
 
 struct pixelbuffer
