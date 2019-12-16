@@ -1,11 +1,15 @@
-#include "window.h"
+#include "femtobox/engine/window.h" /* Declarations. */
 
-#include "stdio.h"
+#include <stdio.h>
+#include <string.h>
 
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 
-#include "pixelbuffer.h"
+#include "femtobox/engine/pixelbuffer.h"
+
+/* Version string loaded at compile time. */
+extern char _binary_data_version_start[];
 
 struct window
 {
@@ -24,8 +28,14 @@ window_t* window_alloc(size_t width, size_t height)
     printf("SDL_Init failed: %s\n", SDL_GetError());
     exit(-1);
   }
-  // TODO: dynamic version string
-  this->window_ = SDL_CreateWindow("Femtobox v0", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
+
+  char* name = "Femtobox ";
+  char version[32];
+  memset(version, 0, 32);
+  strcpy(version, name);
+  strncpy(version + strlen(name), _binary_data_version_start, 32 - strlen(name));
+
+  this->window_ = SDL_CreateWindow(version, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
   if (!this->window_)
   {
     printf("SDL_CreateWindow failed: %s\n", SDL_GetError());

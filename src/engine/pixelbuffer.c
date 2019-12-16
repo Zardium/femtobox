@@ -1,4 +1,4 @@
-#include "pixelbuffer.h" /* Declarations. */
+#include "femtobox/engine/pixelbuffer.h" /* Declarations. */
 
 /* STANDARD LIBRARY */
 #include <stdlib.h> /* malloc, calloc */

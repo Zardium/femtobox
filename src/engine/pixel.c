@@ -1,4 +1,4 @@
-#include "pixel.h"
+#include "femtobox/engine/pixel.h"
 
 void pixel_set(pixel_t* pixel, uint8_t r, uint8_t g, uint8_t b)
 {

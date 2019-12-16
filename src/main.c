@@ -1,14 +1,15 @@
 /* STANDARD LIBRARY */
-#include <stdio.h>
-#include <math.h>
+#include <stdio.h>  /* fread  */
+#include <math.h>   /* sin    */
+#include <string.h> /* strcmp */
 
 /* EXTERNAL LIBRARIES */
 
 /* FEMTOBOX INCLUDES */
-#include "pixel.h"
-#include "window.h"
-#include "input.h"
-#include "timing.h"
+#include "femtobox/engine/pixel.h"
+#include "femtobox/engine/window.h"
+#include "femtobox/engine/input.h"
+#include "femtobox/engine/timing.h"
 
 #define UNUSED_PARAMETER(x) ((void)(x))
 #define INTERNAL_WIDTH  256
@@ -24,8 +25,20 @@ int main(int argc, char* argv[])
   window_attach_pixelbuffer(win, pix_buf);
   
   input_t* in = input_alloc();
+
+  char in_buffer[32];
+  memset(in_buffer, 0, 32);
+  fgets(in_buffer, 32, stdin);
+
+  printf("%.*s", 32, in_buffer);
+
+  if (strncmp(in_buffer, "SET", 3) == 0)
+  {
+    puts("Set instruction.");
+  }
+
   int running = true;
-  while(running)
+  while (running)
   {
     input_poll(in);
     if (input_quit(in))

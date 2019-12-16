@@ -5,43 +5,56 @@
 ASSIGNMENTNAME=femtobox
 SRC_EXT=.c
 
-OUTPUT_DIR=./bin/
-OBJECT_DIR=$(OUTPUT_DIR)obj/
-SOURCE_DIR=./src/
-INCLUDE=./include/
+OUT_DIR=bin/
+OBJ_DIR=$(OUT_DIR)obj/
+SRC_DIR=src/
+DATA_DIR=data/
+INCLUDE=include/
 
-EXE=$(OUTPUT_DIR)$(ASSIGNMENTNAME)
+EXE=$(OUT_DIR)$(ASSIGNMENTNAME)
 
 CC=gcc
 CXX=g++
 COMPILER=$(CC)
+LINKER=ld
 CFLAGS=-Wall -Wextra -Werror -std=c11 -pedantic -g -O0
 LFLAGS=-lSDL2 -lm
 FLAGS=
 
-ERASE=rm -f
+ERASE=rm -rf
 
 NUMBERS=0 1 2 3 4 5 6 7 8 9 10 11
 NAMES=all add_front add_end remove1 remove2 insert_before1 insert_after1 find1 \
 find2 find_stress1 find_stress2 test_a_lot
 
-SRC=$(wildcard $(SOURCE_DIR)*$(SRC_EXT))
-OBJ=$(patsubst $(SOURCE_DIR)%$(SRC_EXT),$(OBJECT_DIR)%.o, $(SRC))
+SRC=$(wildcard $(SRC_DIR)*$(SRC_EXT)) $(wildcard $(SRC_DIR)**/*$(SRC_EXT))
+DATA=$(wildcard $(DATA_DIR)*) $(wildcard $(DATA_DIR)**/*)
+OBJ=$(patsubst $(SRC_DIR)%$(SRC_EXT),$(OBJ_DIR)%.o, $(SRC))
+DATA_OBJ=$(patsubst %,$(OBJ_DIR)%.o, $(DATA))
 
-ZIPPABLES=$(SRC) ./typescript ./latex/refman.pdf
+ZIPPABLES=$(SRC) typescript latex/refman.pdf
+
+
 
 # TARGETS ========================================
 
 build : $(EXE)
+
+help : $(dir $(OBJ_DIR)engine/timing.o)
 	
-$(EXE) : $(OBJ)
->$(COMPILER) $(CFLAGS) -I$(INCLUDE) $^ -o $@ $(LFLAGS) 
+$(EXE) : $(OBJ) $(DATA_OBJ) | $(OUT_DIR)
+>$(COMPILER) $(CFLAGS) -I$(INCLUDE) $^ -o $@ $(LFLAGS)
 
-$(OBJECT_DIR)%.o : $(SOURCE_DIR)%$(SRC_EXT) | $(OBJECT_DIR)
->$(COMPILER) $(CFLAGS) -I$(INCLUDE) -c $^ -o $@
+.SECONDEXPANSION:
 
-$(OBJECT_DIR) :
->mkdir -p $(OBJECT_DIR)
+$(OBJ_DIR)%.o : $(SRC_DIR)%$(SRC_EXT) | $$(dir $$@)
+>$(COMPILER) $(CFLAGS) -I$(INCLUDE) -c $< -o $@
+
+$(OBJ_DIR)data/%.o : $(DATA_DIR)% | $$(dir $$@)
+>$(LINKER) -r -b binary -o $@ $< --leading-underscore
+
+%/ :
+>mkdir -p $@
 
 $(NUMBERS) :
 >./$(EXE) $@ > student-output-$(word $(shell expr $@ + 1), $(NAMES))
@@ -51,7 +64,7 @@ run :
 >$(EXE) $(FLAGS)
 
 clean :
->$(ERASE) $(OBJ) $(EXE)
+>$(ERASE) $(OBJ_DIR) $(OBJ) $(DATA_OBJ) $(EXE)
 
 rebuild: clean build
 
@@ -63,8 +76,8 @@ script :
 preprocess :
 >$(COMPILER) $(CFLAGS) -I$(INCLUDE) -E $(SRC) -o preprocessed$(SRC_EXT)
 
-zip :
->zip submission_$(ASSIGNMENTNAME).zip -xi $(ZIPPABLES)
+zip : $(ZIPPABLES)
+>zip submission_$(ASSIGNMENTNAME).zip -xi $?
 
 # debug printing of variables at runtime
 print-%  : ; @echo $*=$($*)
