@@ -6,14 +6,20 @@
 /* EXTERNAL LIBRARIES */
 
 /* FEMTOBOX INCLUDES */
-#include "femtobox/engine/pixel.h"
-#include "femtobox/engine/window.h"
-#include "femtobox/engine/input.h"
-#include "femtobox/engine/timing.h"
 
-#define UNUSED_PARAMETER(x) ((void)(x))
-#define INTERNAL_WIDTH  256
-#define INTERNAL_HEIGHT 256
+  /* ENGINE INCLUDES */
+  #include "femtobox/engine/pixel.h"
+  #include "femtobox/engine/window.h"
+  #include "femtobox/engine/input.h"
+  #include "femtobox/engine/timing.h"
+
+  /* FE INCLUDES */
+  #include "femtobox/fe/lexer.h"
+  #include "femtobox/fe/instruction.h"
+
+  #define UNUSED_PARAMETER(x) ((void)(x))
+  #define INTERNAL_WIDTH  256
+  #define INTERNAL_HEIGHT 256
 
 int main(int argc, char* argv[])
 {
@@ -30,12 +36,10 @@ int main(int argc, char* argv[])
   memset(in_buffer, 0, 32);
   fgets(in_buffer, 32, stdin);
 
-  printf("%.*s", 32, in_buffer);
+  //printf("%.*s", 32, in_buffer);
 
-  if (strncmp(in_buffer, "SET", 3) == 0)
-  {
-    puts("Set instruction.");
-  }
+  instruction_t* instr = lexer_read(in_buffer);
+  printf("%s instruction.\n", instruction_str(instr->opcode));
 
   int running = true;
   while (running)

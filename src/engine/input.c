@@ -21,7 +21,7 @@ static void swap_keys_(input_t*);
 
 static void handle_event_(input_t*);
 
-static bool symbol_in_range(SDL_Keycode);
+static bool symbol_in_range_(SDL_Keycode);
 
 /* Public function implementations. */
 
@@ -56,7 +56,7 @@ bool input_quit(input_t* this)
 bool input_pushed(input_t* this, char key)
 {
   uint16_t key_u = key;
-  return symbol_in_range(key_u) &&
+  return symbol_in_range_(key_u) &&
          this->keys_[key_u] == SDL_PRESSED &&
          this->keys_prev_[key_u] == SDL_RELEASED;
 }
@@ -64,7 +64,7 @@ bool input_pushed(input_t* this, char key)
 bool input_released(input_t* this, char key)
 {
   uint16_t key_u = key;
-  return symbol_in_range(key_u) &&
+  return symbol_in_range_(key_u) &&
          this->keys_[key_u] == SDL_RELEASED &&
          this->keys_prev_[key_u] == SDL_PRESSED;
 }
@@ -72,7 +72,7 @@ bool input_released(input_t* this, char key)
 bool input_held(input_t* this, char key)
 {
   uint16_t key_u = key;
-  return symbol_in_range(key_u) &&
+  return symbol_in_range_(key_u) &&
          this->keys_[key_u] == SDL_PRESSED &&
          this->keys_prev_[key_u] == SDL_PRESSED;
 }
@@ -101,7 +101,7 @@ void handle_event_(input_t* this)
     case SDL_KEYDOWN:
     {
       SDL_Keycode symbol = this->event_.key.keysym.sym;
-      if (symbol_in_range(symbol))
+      if (symbol_in_range_(symbol))
       {
         this->keys_[symbol] = SDL_PRESSED;
       }
@@ -110,7 +110,7 @@ void handle_event_(input_t* this)
     case SDL_KEYUP:
     {
       SDL_Keycode symbol = this->event_.key.keysym.sym;
-      if (symbol_in_range(symbol))
+      if (symbol_in_range_(symbol))
       {
         this->keys_[symbol] = SDL_RELEASED;
       }
@@ -123,7 +123,7 @@ void handle_event_(input_t* this)
   }
 }
 
-static bool symbol_in_range(int symbol)
+static bool symbol_in_range_(int symbol)
 {
   return symbol >= 0 && symbol < MAX_KEY_COUNT;
 }

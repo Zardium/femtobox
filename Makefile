@@ -39,8 +39,6 @@ ZIPPABLES=$(SRC) typescript latex/refman.pdf
 # TARGETS ========================================
 
 build : $(EXE)
-
-help : $(dir $(OBJ_DIR)engine/timing.o)
 	
 $(EXE) : $(OBJ) $(DATA_OBJ) | $(OUT_DIR)
 >$(COMPILER) $(CFLAGS) -I$(INCLUDE) $^ -o $@ $(LFLAGS)
@@ -52,6 +50,8 @@ $(OBJ_DIR)%.o : $(SRC_DIR)%$(SRC_EXT) | $$(dir $$@)
 
 $(OBJ_DIR)data/%.o : $(DATA_DIR)% | $$(dir $$@)
 >$(LINKER) -r -b binary -o $@ $< --leading-underscore
+
+.SECONDARY: */
 
 %/ :
 >mkdir -p $@
