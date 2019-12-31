@@ -8,8 +8,9 @@
 typedef struct instruction
 {
   uint16_t opcode;
-  uint16_t result;
-  struct instruction* source[INSTRUCTION_MAX_ARGUMENTS];
+  int16_t  result;
+  uint16_t argument_count;
+  struct instruction* arguments[INSTRUCTION_MAX_ARGUMENTS];
 } instruction_t;
 
 instruction_t* instruction_alloc(uint16_t opcode);

@@ -6,16 +6,15 @@
 /* EXTERNAL LIBRARIES */
 
 /* FEMTOBOX INCLUDES */
-
   /* ENGINE INCLUDES */
   #include "femtobox/engine/pixel.h"
   #include "femtobox/engine/window.h"
   #include "femtobox/engine/input.h"
   #include "femtobox/engine/timing.h"
-
   /* FE INCLUDES */
   #include "femtobox/fe/lexer.h"
   #include "femtobox/fe/instruction.h"
+  #include "femtobox/fe/interpreter.h"
 
   #define UNUSED_PARAMETER(x) ((void)(x))
   #define INTERNAL_WIDTH  256
@@ -33,13 +32,6 @@ int main(int argc, char* argv[])
   input_t* in = input_alloc();
 
   char in_buffer[32];
-  memset(in_buffer, 0, 32);
-  fgets(in_buffer, 32, stdin);
-
-  //printf("%.*s", 32, in_buffer);
-
-  instruction_t* instr = lexer_read(in_buffer);
-  printf("%s instruction.\n", instruction_str(instr->opcode));
 
   int running = true;
   while (running)
@@ -50,26 +42,34 @@ int main(int argc, char* argv[])
       running = false;
       continue;
     }
+    
+    memset(in_buffer, 0, 32);
+    fgets(in_buffer, 32, stdin);
 
-    size_t ticks = timing_get_ticks();
-    for (size_t i = 0; i < pixelbuffer_width(pix_buf); ++i)
-    {
-      for (size_t j = 0; j < pixelbuffer_height(pix_buf); ++j)
-      {
-        pixel_t new_pixel;
-        if (j % 16 == 0 || i % 16 == 0)
-        {
-          pixel_set(&new_pixel, 0, 0, 0);
-        }
-        else
-        {
-          pixel_set(&new_pixel, i * 255 / INTERNAL_HEIGHT, j * 255 / INTERNAL_HEIGHT, (uint8_t)(INTERNAL_HEIGHT / 2 * (1.f + sin((double)ticks / 500)))* 255 / INTERNAL_HEIGHT);
-          //pixel_set(&new_pixel, 255, 128, 255);
-        }
+    instruction_t* instr = lexer_read(in_buffer);
+    printf("%s instruction.\n", instruction_str(instr->opcode));
+    printf("Result: %d.\n", interpreter_execute(instr));
+    instruction_free(&instr);
+
+    // size_t ticks = timing_get_ticks();
+    // for (size_t i = 0; i < pixelbuffer_width(pix_buf); ++i)
+    // {
+    //   for (size_t j = 0; j < pixelbuffer_height(pix_buf); ++j)
+    //   {
+    //     pixel_t new_pixel;
+    //     if (j % 16 == 0 || i % 16 == 0)
+    //     {
+    //       pixel_set(&new_pixel, 0, 0, 0);
+    //     }
+    //     else
+    //     {
+    //       pixel_set(&new_pixel, i * 255 / INTERNAL_HEIGHT, j * 255 / INTERNAL_HEIGHT, (uint8_t)(INTERNAL_HEIGHT / 2 * (1.f + sin((double)ticks / 500)))* 255 / INTERNAL_HEIGHT);
+    //       //pixel_set(&new_pixel, 255, 128, 255);
+    //     }
         
-        pixelbuffer_set(pix_buf, i, j, new_pixel);
-      }
-    }
+    //     pixelbuffer_set(pix_buf, i, j, new_pixel);
+    //   }
+    // }
 
     window_update(win);
     timing_delay(16);
