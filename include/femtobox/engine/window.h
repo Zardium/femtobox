@@ -11,6 +11,8 @@ window_t* window_alloc(size_t width, size_t height);
 
 void window_free(window_t**);
 
+void window_show(window_t*);
+
 void window_attach_pixelbuffer(window_t*, pixelbuffer_t*);
 
 void window_update(window_t*);

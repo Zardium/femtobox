@@ -6,12 +6,15 @@
 #include <string.h>
 #include <stdlib.h> /* calloc */
 
-/* Instruction set loaded at compile time. */
-extern char  _binary_data_instructions_start[];
-extern char  _binary_data_instructions_end[];
-extern char *_binary_data_instructions_size;
+/* Public variable definitions. */
 
-#define INSTRUCTION_COUNT ((uintptr_t)&_binary_data_instructions_size) / (INSTRUCTION_NAME_LENGTH + 1)
+char const* opcode_names[] =
+{
+  "NUL",
+  "VAL",
+  "NEG",
+  "ADD",
+};
 
 /* Private function declarations. */
 
@@ -30,31 +33,16 @@ void instruction_free(instruction_t** instr)
   *instr = NULL;
 }
 
-uint16_t instruction_opcode(char const* str)
+opcode_t opcode_from_string(char const* name)
 {
-  for (uint16_t i = 0; i < INSTRUCTION_COUNT; ++i)
+  for (int i = 0; i < OPCODE_COUNT; ++i)
   {
-    if (strncmp(str, instruction_str(i), INSTRUCTION_NAME_LENGTH) == 0)
+    if (strcmp(name, opcode_names[i]) == 0)
     {
-      return i;
+      return (opcode_t)i;
     }
   }
-  return UINT16_MAX;
-}
-
-char const* instruction_str(uint16_t opcode)
-{
-  if (opcode != UINT16_MAX)
-  {
-    size_t offset = opcode * (INSTRUCTION_NAME_LENGTH + 1);
-    /* NUL-terminate the string. */
-    _binary_data_instructions_start[offset + INSTRUCTION_NAME_LENGTH] = '\0';
-    return _binary_data_instructions_start + offset;
-  }
-  else
-  {
-    return "NUL";
-  }
+  return ERR;
 }
 
 /* Private function implementations. */

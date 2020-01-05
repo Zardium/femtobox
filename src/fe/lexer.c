@@ -1,64 +1,74 @@
 #include "femtobox/fe/lexer.h"
 
 #include <string.h> /* strncmp */
-#include <ctype.h>  /* toupper, isspace */
+#include <ctype.h>  /* toupper, isspace, isalpha, isdigit */
 #include <stdlib.h> /* atoi */
+
+#include "femtobox/fe/instruction.h" /* opcode_from_string */
 
 /* Private function declarations. */
 
-char const* skip_whitespace_(char const* it);
+static char const* skip_whitespace(char const* it);
 
-char const* iterate_to_(char const* it, char c);
+static token_t* consume_instruction(char const** it);
+
+static token_t* consume_integer(char const** it);
 
 /* Public function implementations. */
 
-instruction_t* lexer_read(char const* str_input)
+token_t* lexer_tokenize(char const* input)
 {
-  /* Iterator. */
-  char const* it = NULL;
-
-  uint16_t opcode = instruction_opcode(str_input);
-  if (opcode == UINT16_MAX)
-  {
-    return NULL;
-  }
-
-  instruction_t* instr = instruction_alloc(opcode);
-
-  it = str_input + INSTRUCTION_NAME_LENGTH;
-  if ((*it) == '\0')
-  {
-    return NULL;
-  }
-  it = skip_whitespace_(it);
-  
-  /* TODO: Generic code for instruction selection (use a lookup table) */
-  if (strncmp(instruction_str(opcode), "VAL", INSTRUCTION_NAME_LENGTH) == 0)
-  {
-    instr->result = atoi(it);
-    return instr;
-  }
-
+  token_t* head = NULL;
+  token_t* tail = NULL;
+  char const* it = input;
   while (*it)
   {
-    switch (*it)
+    token_t* new_token = NULL;
+    it = skip_whitespace(it);
+    if (isdigit(*it))
     {
-      case '(':
-        instr->arguments[instr->argument_count++] = lexer_read(it + 1);
-        it = iterate_to_(it, ')');
-        break;
-      default:
-        ++it;
-        break;
+      new_token = consume_integer(&it);
+    }
+    else if (isalpha(*it))
+    {
+      new_token = consume_instruction(&it);
+    }
+    else
+    {
+      switch (*it)
+      {
+        case ',':
+          new_token = token_alloc(token_comma, 0);
+          break;
+        case '(':
+          new_token = token_alloc(token_paren_l, 0);
+          break;
+        case ')':
+          new_token = token_alloc(token_paren_r, 0);
+          break;
+        default: // TODO: stick an error instruction in here
+          break;
+      }
+      ++it;
+    }
+    /* So no head? */
+    if (!head)
+    {
+      head = new_token;
+      tail = new_token;
+    }
+    else
+    {
+      tail->next = new_token;
+      tail = tail->next;
     }
   }
-
-  return instr;
+  return head;
 }
 
 /* Private function implementations. */
 
-char const* skip_whitespace_(char const* it)
+static char const* skip_whitespace(char const* it)
 {
   while (isspace(*it))
   {
@@ -67,12 +77,34 @@ char const* skip_whitespace_(char const* it)
   return it;
 }
 
-/* TODO: make this safe */
-char const* iterate_to_(char const* it, char c)
+static token_t* consume_instruction(char const** it)
 {
-  while (*it != c)
+  char const* begin = *it;
+  while (isalpha(**it))
   {
-    ++it;
+    ++(*it);
   }
-  return it;
+  size_t name_length = *it - begin;
+  /* +1 to account for NUL-terminator. */
+  char buffer[name_length + 1];
+  strncpy(buffer, begin, name_length);
+  buffer[name_length] = '\0';
+
+  return token_alloc(token_instruction, opcode_from_string(buffer));
+}
+
+static token_t* consume_integer(char const** it)
+{
+  char const* begin = *it;
+  while (isdigit(**it))
+  {
+    ++(*it);
+  }
+  size_t digit_count = *it - begin;
+  /* +1 to account for NUL-terminator. */
+  char buffer[digit_count + 1];
+  strncpy(buffer, begin, digit_count);
+  buffer[digit_count] = '\0';
+
+  return token_alloc(token_integer, atoi(buffer));
 }

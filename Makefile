@@ -13,7 +13,7 @@ INCLUDE=include
 
 EXE=$(OUT_DIR)/$(PROJECT)
 
-CC=gcc
+CC=clang
 CXX=g++
 COMPILER=$(CC)
 LINKER=ld
@@ -52,7 +52,7 @@ $(OBJ_DIR)/$(DATA_DIR)/%.o : $(DATA_DIR)/% | $$(dir $$@)
 >$(LINKER) -r -b binary -o $@ $<
 # --leading-underscore
 
-.SECONDARY: */
+.SECONDARY: ./**/
 
 %/ :
 >mkdir -p $@

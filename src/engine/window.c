@@ -35,13 +35,13 @@ window_t* window_alloc(size_t width, size_t height)
   strcpy(version, name);
   strncpy(version + strlen(name), _binary_data_version_start, 32 - strlen(name));
 
-  this->window_ = SDL_CreateWindow(version, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
+  this->window_ = SDL_CreateWindow(version, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_HIDDEN);
   if (!this->window_)
   {
     printf("SDL_CreateWindow failed: %s\n", SDL_GetError());
     exit(-1);
   }
-  this->renderer_ = SDL_CreateRenderer(this->window_, -1, 0);
+  this->renderer_ = SDL_CreateRenderer(this->window_, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   if (!this->renderer_)
   {
     printf("SDL_CreateRenderer failed: %s\n", SDL_GetError());
@@ -62,6 +62,11 @@ void window_free(window_t** p_this)
 
   free(*p_this);
   *p_this = NULL;
+}
+
+void window_show(window_t* this)
+{
+  SDL_ShowWindow(this->window_);
 }
 
 void window_attach_pixelbuffer(window_t* this, pixelbuffer_t* pixelbuffer)
