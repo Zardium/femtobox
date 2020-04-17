@@ -1,5 +1,5 @@
 # femtobox
-a tiny virtual machine with a robust assembly-style language interface
+a tiny virtual machine with a language interface somewhere between Lisp and assembly
 
 ### features
 * 16 colors!
